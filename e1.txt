@@ -1,0 +1,231 @@
+mysql -u batch -p
+
+
+#Query:-
+CREATE DATABASE library;
+USE library;
+
+#language
+CREATE TABLE language (
+  lang_id int PRIMARY KEY,
+  name varchar(20)
+);
+mysql> desc language;
++---------+-------------+------+-----+---------+-------+
+| Field   | Type        | Null | Key | Default | Extra |
++---------+-------------+------+-----+---------+-------+
+| lang_id | int(11)     | NO   | PRI | NULL    |       |
+| name    | varchar(20) | YES  |     | NULL    |       |
++---------+-------------+------+-----+---------+-------+
+2 rows in set (0.03 sec)
+
+
+#publisher
+CREATE TABLE publisher (
+  publisher_id int PRIMARY KEY,
+  name varchar(20),
+  address varchar(100)
+);
+mysql> desc publisher;
++--------------+--------------+------+-----+---------+-------+
+| Field        | Type         | Null | Key | Default | Extra |
++--------------+--------------+------+-----+---------+-------+
+| publisher_id | int(11)      | NO   | PRI | NULL    |       |
+| name         | varchar(20)  | YES  |     | NULL    |       |
+| address      | varchar(100) | YES  |     | NULL    |       |
++--------------+--------------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+
+
+#member
+CREATE TABLE member (
+  member_id int PRIMARY KEY,
+  data_of_join date,
+  email varchar(20),
+  phn_no int,
+  roll_no int,
+  name varchar(20),
+  branch_code int,
+  status varchar(20)
+);
+mysql> desc member;
++--------------+-------------+------+-----+---------+-------+
+| Field        | Type        | Null | Key | Default | Extra |
++--------------+-------------+------+-----+---------+-------+
+| member_id    | int(11)     | NO   | PRI | NULL    |       |
+| data_of_join | date        | YES  |     | NULL    |       |
+| email        | varchar(20) | YES  |     | NULL    |       |
+| phn_no       | int(11)     | YES  |     | NULL    |       |
+| roll_no      | int(11)     | YES  |     | NULL    |       |
+| name         | varchar(20) | YES  |     | NULL    |       |
+| branch_code  | int(11)     | YES  |     | NULL    |       |
+| status       | varchar(20) | YES  |     | NULL    |       |
++--------------+-------------+------+-----+---------+-------+
+8 rows in set (0.00 sec)
+
+
+#books
+CREATE TABLE books (
+  book_id int PRIMARY KEY,
+  title varchar(20),
+  volume int,
+  status varchar(20),
+  lang_id int,
+  FOREIGN KEY (lang_id) REFERENCES language (lang_id),
+  published_date date,
+  publisher_id int,
+  FOREIGN KEY (publisher_id) REFERENCES publisher (publisher_id),
+  mrp int
+);
+mysql> desc books;
++----------------+-------------+------+-----+---------+-------+
+| Field          | Type        | Null | Key | Default | Extra |
++----------------+-------------+------+-----+---------+-------+
+| book_id        | int(11)     | NO   | PRI | NULL    |       |
+| title          | varchar(20) | YES  |     | NULL    |       |
+| volume         | int(11)     | YES  |     | NULL    |       |
+| status         | varchar(20) | YES  |     | NULL    |       |
+| lang_id        | int(11)     | YES  | MUL | NULL    |       |
+| published_date | date        | YES  |     | NULL    |       |
+| publisher_id   | int(11)     | YES  | MUL | NULL    |       |
+| mrp            | int(11)     | YES  |     | NULL    |       |
++----------------+-------------+------+-----+---------+-------+
+8 rows in set (0.00 sec)
+
+
+#book_issue
+CREATE TABLE book_issue (
+  issue_id int,
+  PRIMARY KEY (issue_id),
+  member_id int,
+  FOREIGN KEY (member_id) REFERENCES member (member_id),
+  book_id int,
+  FOREIGN KEY (book_id) REFERENCES books (book_id),
+  status varchar(20),
+  date_of_issue date,
+  expected_date_of_return date
+);
+mysql> desc book_issue;
++-------------------------+-------------+------+-----+---------+-------+
+| Field                   | Type        | Null | Key | Default | Extra |
++-------------------------+-------------+------+-----+---------+-------+
+| issue_id                | int(11)     | NO   | PRI | NULL    |       |
+| member_id               | int(11)     | YES  | MUL | NULL    |       |
+| book_id                 | int(11)     | YES  | MUL | NULL    |       |
+| status                  | varchar(20) | YES  |     | NULL    |       |
+| date_of_issue           | date        | YES  |     | NULL    |       |
+| expected_date_of_return | date        | YES  |     | NULL    |       |
++-------------------------+-------------+------+-----+---------+-------+
+6 rows in set (0.00 sec)
+
+
+#book_return
+CREATE TABLE book_return (
+  issue_id int PRIMARY KEY,
+  actual_date_of_return date,
+  late_days int,
+  late_fee int
+);
+mysql> desc book_return;
++-----------------------+---------+------+-----+---------+-------+
+| Field                 | Type    | Null | Key | Default | Extra |
++-----------------------+---------+------+-----+---------+-------+
+| issue_id              | int(11) | NO   | PRI | NULL    |       |
+| actual_date_of_return | date    | YES  |     | NULL    |       |
+| late_days             | int(11) | YES  |     | NULL    |       |
+| late_fee              | int(11) | YES  |     | NULL    |       |
++-----------------------+---------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+
+#book_author
+CREATE TABLE book_author (
+  book_id int,
+  FOREIGN KEY (book_id) REFERENCES books (book_id),
+  author_id int,
+  FOREIGN KEY (author_id) REFERENCES author (author_id)
+);
+mysql> desc book_author;
++-----------+---------+------+-----+---------+-------+
+| Field     | Type    | Null | Key | Default | Extra |
++-----------+---------+------+-----+---------+-------+
+| book_id   | int(11) | YES  | MUL | NULL    |       |
+| author_id | int(11) | YES  | MUL | NULL    |       |
++-----------+---------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+
+#late_fee_rule
+CREATE TABLE late_fee_rule (
+  from_days int,
+  to_days int,
+  amount int
+);
+mysql> desc late_fee_rule;
++-----------+---------+------+-----+---------+-------+
+| Field     | Type    | Null | Key | Default | Extra |
++-----------+---------+------+-----+---------+-------+
+| from_days | int(11) | YES  |     | NULL    |       |
+| to_days   | int(11) | YES  |     | NULL    |       |
+| amount    | int(11) | YES  |     | NULL    |       |
++-----------+---------+------+-----+---------+-------+
+3 rows in set (0.00 sec)
+
+
+#author
+CREATE TABLE author (
+  author_id int PRIMARY KEY,
+  status varchar(20),
+  email varchar(20),
+  name int,
+  phn_no int
+);
+mysql> desc author;
++-----------+-------------+------+-----+---------+-------+
+| Field     | Type        | Null | Key | Default | Extra |
++-----------+-------------+------+-----+---------+-------+
+| author_id | int(11)     | NO   | PRI | NULL    |       |
+| status    | varchar(20) | YES  |     | NULL    |       |
+| email     | varchar(20) | YES  |     | NULL    |       |
+| name      | int(11)     | YES  |     | NULL    |       |
+| phn_no    | int(11)     | YES  |     | NULL    |       |
++-----------+-------------+------+-----+---------+-------+
+5 rows in set (0.05 sec)
+
+
+
+#tables:-
+show tables;
++-------------------+
+| Tables_in_library |
++-------------------+
+| author            |
+| book_author       |
+| book_issue        |
+| book_return       |
+| books             |
+| language          |
+| late_fee_rule     |
+| member            |
+| publisher         |
++-------------------+
+9 rows in set (0.00 sec)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
