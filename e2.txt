@@ -1,0 +1,113 @@
+1-> Create and execute drop table command in tables with and without FK constraints ?
+
+Ans->
+	DROP TABLE books;
+	ERROR 1217 (23000): Cannot delete or update a parent row: a foreign key constraint fails
+
+	SHOW CREATE TABLE books;
+	| books | CREATE TABLE `books` (
+	  `book_id` int(11) NOT NULL,
+	  `title` varchar(20) DEFAULT NULL,
+	  `volume` int(11) DEFAULT NULL,
+	  `status` varchar(20) DEFAULT NULL,
+	  `lang_id` int(11) DEFAULT NULL,
+	  `published_date` date DEFAULT NULL,
+	  `publisher_id` int(11) DEFAULT NULL,
+	  `mrp` int(11) DEFAULT NULL,
+	  PRIMARY KEY (`book_id`),
+	  KEY `lang_id` (`lang_id`),
+	  KEY `publisher_id` (`publisher_id`),
+	  CONSTRAINT `books_ibfk_1` FOREIGN KEY (`lang_id`) REFERENCES `language` (`lang_id`),
+	  CONSTRAINT `books_ibfk_2` FOREIGN KEY (`publisher_id`) REFERENCES `publisher` (`publisher_id`)
+	) ENGINE=InnoDB DEFAULT CHARSET=latin1 |
+
+
+	ALTER TABLE books
+	DROP foreign key books_ibfk_1;
+	Query OK, 0 rows affected (0.19 sec)
+	Records: 0  Duplicates: 0  Warnings: 0
+
+	ALTER TABLE books DROP foreign key books_ibfk_2;
+	Query OK, 0 rows affected (0.09 sec)
+	Records: 0  Duplicates: 0  Warnings: 0
+
+	SET foreign_key_checks = 0;
+	Query OK, 0 rows affected (0.02 sec)
+
+	DROP TABLE books;
+	Query OK, 0 rows affected (0.21 sec)
+
+
+
+2-> Create and execute ALTER table command in tables with data and without data ?
+
+Ans->
+
+	(a) WITHOUT DATA:-
+	--------------------
+
+
+		DESC language;
+		+---------+-------------+------+-----+---------+-------+
+		| Field   | Type        | Null | Key | Default | Extra |
+		+---------+-------------+------+-----+---------+-------+
+		| lang_id | int(11)     | NO   | PRI | NULL    |       |
+		| name    | varchar(20) | YES  |     | NULL    |       |
+		+---------+-------------+------+-----+---------+-------+
+
+
+		ALTER TABLE language
+		ADD phn_no INT;
+		+---------+-------------+------+-----+---------+-------+
+		| Field   | Type        | Null | Key | Default | Extra |
+		+---------+-------------+------+-----+---------+-------+
+		| lang_id | int(11)     | NO   | PRI | NULL    |       |
+		| name    | varchar(20) | YES  |     | NULL    |       |
+		| phn_no  | int(11)     | YES  |     | NULL    |       |
+		+---------+-------------+------+-----+---------+-------+
+
+
+		ALTER TABLE language
+		MODIFY COLUMN phn_no varchar(20);
+		+---------+-------------+------+-----+---------+-------+
+		| Field   | Type        | Null | Key | Default | Extra |
+		+---------+-------------+------+-----+---------+-------+
+		| lang_id | int(11)     | NO   | PRI | NULL    |       |
+		| name    | varchar(20) | YES  |     | NULL    |       |
+		| phn_no  | varchar(20) | YES  |     | NULL    |       |
+		+---------+-------------+------+-----+---------+-------+
+
+	(b) WITH DATA:-
+	--------------------
+
+		INSERT INTO language
+		VALUES (1001,"Jony",123456789);
+		+---------+------+-----------+
+		| lang_id | name | phn_no    |
+		+---------+------+-----------+
+		|    1001 | Jony | 123456789 |
+		+---------+------+-----------+
+
+		ALTER TABLE language
+		MODIFY COLUMN name INT;
+		ERROR 1366 (HY000): Incorrect integer value: 'Jony' for column 'name' at row 1
+
+3->Create and Execute SQL command to build indicies on member_id and book_id in table book_issue ?
+Ans->
+
+	CREATE INDEX Si_no ON book_issue (member_id);
+	CREATE INDEX book_no ON book_issue (book_id);
+
+	show indexes from book_issue;
+	+------------+------------+----------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+
+	| Table      | Non_unique | Key_name | Seq_in_index | Column_name | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment |
+	+------------+------------+----------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+
+	| book_issue |          0 | PRIMARY  |            1 | issue_id    | A         |           0 |     NULL | NULL   |      | BTREE      |         |               |
+	| book_issue |          1 | Si_no    |            1 | member_id   | A         |           0 |     NULL | NULL   | YES  | BTREE      |         |               |
+	| book_issue |          1 | book_no  |            1 | book_id     | A         |           0 |     NULL | NULL   | YES  | BTREE      |         |               |
+	+------------+------------+----------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+
+
+
+
+
+
